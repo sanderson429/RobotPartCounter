@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:newprojectfluttertesttobedeleted/my_counter.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (_) => ResetCounterProvider()),
+    ],
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -40,59 +47,50 @@ class _MyHomePageState extends State<MyHomePage> {
   int _robotsAssembled = 0;
 
 //region METHODS
-  // Methods for "HEAD"
-  void _incrementHCounter() {
+  void _updateHCounter(int newValue) {
     setState(() {
-      _hCounter++;
+      _hCounter = newValue;
     });
   }
 
-  void _subtractHCounter() {
+  void _updateACounter(int newValue) {
     setState(() {
-      if (_hCounter > 0) _hCounter--;
+      _aCounter = newValue;
     });
   }
 
-  // Methods for "ARM"
-  void _incrementACounter() {
+  void _updateLCounter(int newValue) {
     setState(() {
-      _aCounter++;
+      _lCounter = newValue;
     });
-  }
-
-  void _subtractACounter() {
-    setState(() {
-      if (_aCounter > 0) _aCounter--;
-    });
-  }
-
-  // Methods for "LEG"
-  void _incrementLCounter() {
-    setState(() {
-      _lCounter++;
-    });
-  }
-
-  void _subtractLCounter() {
-    setState(() {
-      if (_lCounter > 0) _lCounter--;
-    });
-    // Methods for Total Robot Assembled Count
   }
 
   // Methods for "ASSEMBLE"
   void _assembleRobot() {
     setState(() {
-      _reset();
+      _resetCounters();
       _robotsAssembled++;
     });
   }
 
-  void _reset() {
+  void _resetAll() {
+    setState(() {
+      _resetCounters();
+      _resetRobots();
+    });
+  }
+
+  void _resetCounters() {
     setState(() {
       _hCounter = 0;
       _aCounter = 0;
       _lCounter = 0;
+    });
+    context.read<ResetCounterProvider>().triggerReset();
+  }
+
+  void _resetRobots() {
+    setState(() {
       _robotsAssembled = 0;
     });
   }
@@ -111,152 +109,26 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              // Top "HEAD" Button
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  RawMaterialButton(
-                    onPressed: _subtractHCounter,
-                    elevation: 0.0,
-                    fillColor: Colors.red,
-                    padding: const EdgeInsets.all(15.0),
-                    shape: const CircleBorder(),
-                    child: const Icon(
-                      Icons.remove_circle,
-                      size: 28.0,
-                      color: Colors.white,
-                    ),
-                  ),
-                  ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 30, vertical: 20),
-                    ),
-                    icon: const Icon(
-                      Icons.face_5,
-                      color: Colors.white,
-                      size: 30.0,
-                    ),
-                    label: const Text(
-                      'HEAD',
-                      style: TextStyle(
-                        color: Colors.white,
-                        letterSpacing: 4,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 24,
-                      ),
-                    ),
-                    onPressed: _incrementHCounter,
-                  ),
-                ],
+              MyCounter(
+                mainButtonIcon: Icons.face_5,
+                mainButtonText: 'HEAD',
+                desiredValue: 2,
+                onMainButtonPressed: _updateHCounter,
+                onSubtractButtonPressed: _updateHCounter,
               ),
-              Text(
-                '$_hCounter/2',
-                style: const TextStyle(
-                  color: Colors.black12,
-                  letterSpacing: 4,
-                  fontWeight: FontWeight.w800,
-                  fontSize: 36,
-                ),
+              MyCounter(
+                mainButtonIcon: Icons.pan_tool,
+                mainButtonText: 'ARM',
+                desiredValue: 5,
+                onMainButtonPressed: _updateACounter,
+                onSubtractButtonPressed: _updateACounter,
               ),
-              // Middle "ARM" Button
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  RawMaterialButton(
-                    onPressed: _subtractACounter,
-                    elevation: 0.0,
-                    fillColor: Colors.red,
-                    padding: const EdgeInsets.all(15.0),
-                    shape: const CircleBorder(),
-                    child: const Icon(
-                      Icons.remove_circle,
-                      size: 28.0,
-                      color: Colors.white,
-                    ),
-                  ),
-                  ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 38, vertical: 20),
-                    ),
-                    icon: const Icon(
-                      Icons.pan_tool,
-                      color: Colors.white,
-                      size: 30.0,
-                    ),
-                    label: const Text(
-                      'ARM',
-                      style: TextStyle(
-                        color: Colors.white,
-                        letterSpacing: 4,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 24,
-                      ),
-                    ),
-                    onPressed: _incrementACounter,
-                  ),
-                ],
-              ),
-              Text(
-                '$_aCounter/5',
-                style: const TextStyle(
-                  color: Colors.black12,
-                  letterSpacing: 4,
-                  fontWeight: FontWeight.w800,
-                  fontSize: 36,
-                ),
-              ),
-              // Bottom :LEG" Button
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  RawMaterialButton(
-                    onPressed: _subtractLCounter,
-                    elevation: 0.0,
-                    fillColor: Colors.red,
-                    padding: const EdgeInsets.all(15.0),
-                    shape: const CircleBorder(),
-                    child: const Icon(
-                      Icons.remove_circle,
-                      size: 28.0,
-                      color: Colors.white,
-                    ),
-                  ),
-                  ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 42, vertical: 20),
-                    ),
-                    icon: const Icon(
-                      Icons.ice_skating_rounded,
-                      color: Colors.white,
-                      size: 30.0,
-                    ),
-                    label: const Text(
-                      'LEG',
-                      style: TextStyle(
-                        color: Colors.white,
-                        letterSpacing: 4,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 24,
-                      ),
-                    ),
-                    onPressed: _incrementLCounter,
-                  ),
-                ],
-              ),
-              Text(
-                '$_lCounter/3',
-                style: const TextStyle(
-                  color: Colors.black12,
-                  letterSpacing: 4,
-                  fontWeight: FontWeight.w800,
-                  fontSize: 36,
-                ),
+              MyCounter(
+                mainButtonIcon: Icons.ice_skating_rounded,
+                mainButtonText: 'LEG',
+                desiredValue: 3,
+                onMainButtonPressed: _updateLCounter,
+                onSubtractButtonPressed: _updateLCounter,
               ),
               // "ASSEMBLE" Button
               ElevatedButton.icon(
@@ -307,7 +179,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               // Refresh Button
               RawMaterialButton(
-                onPressed: _reset,
+                onPressed: _resetAll,
                 elevation: 0.0,
                 fillColor: Colors.white70,
                 padding: const EdgeInsets.all(15.0),
